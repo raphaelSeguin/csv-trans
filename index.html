@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Salut Gilou !</h1>
+    <p>Charge ton fichier en appuyant sur ce bouton</p>
+    <form>
+        <label for="file-select"></label>
+        <input id="inFile" name="file-select" type="file" class="custom-file-input"/>
+    </form>
+    <a id="dllink" download href="#">télécharge le résultat (s'il ne s'est pas téléchargé automatiquement)</a>
+
+    <script>
+        const inputFile = document.getElementById('inFile');
+        const downloadLink = document.getElementById('dllink');
+
+        const splitStrings = str => {
+            const quotationSplitRegExp = new RegExp('".*?"', 'g');
+            let resultArray = [];
+            let testResult = '';
+            while( (testResult = quotationSplitRegExp.exec(str)) !== null) {
+                resultArray.push(testResult[0]);
+            }
+            return resultArray;
+        }
+        const filterQuotationMarks = str => str.split('').filter( c => c !== '"').join('')
+
+        const replaceDate = str => {
+            const match = str.match(/\d{2}-\d{2}-\d{4}/g);
+            return match ? match[0].replace(/-/g, '/') : str;
+        }
+
+        const convertCSV = data => 
+            data.split('\n')
+                .map(line => {
+                    return splitStrings(line)
+                        .map(filterQuotationMarks)
+                        .map(replaceDate)
+                        .join(';');
+                })
+                .join('\n')
+
+        const fileConverter = file => {
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function() {
+                const text = reader.result;
+                const processedStr = convertCSV(text);
+                const myBlob = new Blob([processedStr], {type : 'text/csv'});
+                console.log(myBlob);
+                dllink.href = window.URL.createObjectURL(myBlob);
+                dllink.click();
+            }
+        }
+        inputFile.addEventListener('change', function() {
+            dllink.textContent = this.files[0].name;
+            fileConverter(this.files[0]);
+        })
+    </script>
+</body>
+</html>

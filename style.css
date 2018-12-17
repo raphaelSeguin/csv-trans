@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css?family=Coming+Soon');
+
+body {
+    background: pink;
+    text-align: center;
+    font-family: 'Coming Soon', cursive;
+}
+h1 {
+    font-size: 3em;
+}
+p {
+    font-size: 2em;
+}
